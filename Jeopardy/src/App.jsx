@@ -8,10 +8,14 @@ function App() {
   ])
   const [ gameStart, setGameStart ] = useState(false);
 
+  const randomCategoryNumber = () => {
+    return Math.floor(Math.random() * (32, 9 + 1)) + 9
+   }
+
   useEffect(() => {
     setTimeout(() => {
       setGameStart(true);
-    }, 3450)
+    }, 0)
   })
 
   return (
@@ -42,7 +46,7 @@ function App() {
             animate-slide-in-right-8'>
               Y</span>
       </section>
-      { gameStart ? <GameOne /> : null }
+      { gameStart ? <GameOne randomCategoryNumber={randomCategoryNumber} /> : null }
     </div>
   )
 }
