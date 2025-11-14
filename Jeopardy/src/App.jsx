@@ -16,7 +16,7 @@ function App() {
     setTimeout(() => {
       setGameStart(true);
     }, 0)
-  })
+  },[])
 
   return (
     <div className='flex  justify-center h-full bg-blue-600'>
