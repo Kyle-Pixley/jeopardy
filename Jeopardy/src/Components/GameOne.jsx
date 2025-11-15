@@ -4,7 +4,7 @@ function GameOne({ randomCategoryNumber, setPlayerScore, setCurrentQuestion }) {
 
   const [ gameOneCatagories, setGameOneCatagories ] = useState([]);
   const [ gameOneMoney, setGameOneMoney ] = useState([200,400,600,800,1000]);
-
+  const [ usedCells, setUsedCells ] = useState({});
 
   useEffect(() => {
     setGameOneCatagories(prev => {
@@ -45,10 +45,18 @@ function GameOne({ randomCategoryNumber, setPlayerScore, setCurrentQuestion }) {
     }
   }
 
-  const cellClicked = (num, colIndex) => {
+  const cellClicked = (num, colIndex, rowIndex) => {
+    const key = `${rowIndex}-${colIndex}`;
+
+    setUsedCells(prev => ({
+      ...prev,
+      [key]: true
+    }));
+
     const catagory = gameOneCatagories[colIndex]
-    console.log(num, catagory)
     setCurrentQuestion([num, catagory]);
+    console.log('col: ', colIndex)
+    console.log('row: ', rowIndex)
   }
 
 
@@ -70,18 +78,24 @@ function GameOne({ randomCategoryNumber, setPlayerScore, setCurrentQuestion }) {
               </div>
 
                 {gameOneMoney.map((num, rowIndex) => (
-                  <div  
-                  className='flex w-full h-[16.66%]' key={rowIndex}>
+                  <div className='flex w-full h-[16.66%]' key={rowIndex}>
+                    {Array.from({ length: 6 }).map((_, colIndex) => {
 
-                    {Array.from({ length: 6 }).map((_, colIndex) => (
-                      <div className='border-2 w-[16.66%] h-full flex justify-center items-center'
-                      key={`${rowIndex}-${colIndex}`}
-                      onClick={()=> cellClicked(num,colIndex)}
-                        >{num}</div>
-                    ))}
-                    
-                    </div>
-                    ))}
+                      const key = `${rowIndex}-${colIndex}`;
+                      const isUsed = usedCells[key];
+
+                      return (
+                        <div
+                          key={key}
+                          className={`border-2 w-[16.66%] h-full flex justify-center items-center ${isUsed ? 'opacity-40 pointer-events-none' : 'cursor-pointer'}`}
+                          onClick={() => !isUsed && cellClicked(num,colIndex,rowIndex)}>
+                          {isUsed ? '' : num}
+                        </div>
+                      )
+                    })}
+                  </div>
+                ))}
+
               </section>
             
           </div>

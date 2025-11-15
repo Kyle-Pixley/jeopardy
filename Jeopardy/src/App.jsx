@@ -40,7 +40,7 @@ function App() {
   useEffect(() => {
     setTimeout(() => {
       setGameStart(true);
-    }, 0)
+    }, 3500)
   },[])
 
   return (

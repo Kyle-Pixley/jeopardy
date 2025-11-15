@@ -1,21 +1,45 @@
 import React, { useEffect, useState } from 'react';
+import he from "he";
+import Button from '@mui/material/Button';
 
 function CurrentQuestion({ playerScore, setPlayerScore, currentQuestion, setCurrentQuestion }) {
 
     const [ question, setQuestion ] = useState('');
+    const [ questionData, setQuestionData ] = useState('');
     const [ answers, setAnswers ] = useState([]);
+    const [ correctAnswer, setCorrectAnswer ] = useState('');
 
-    const handleAnswer = () => {
-        setPlayerScore(playerScore + currentQuestion[0])
-        setCurrentQuestion(null)
+    const handleAnswer = ans => {
+
+        if(ans === correctAnswer) {
+            setPlayerScore(playerScore + currentQuestion[0])
+        } else setPlayerScore(playerScore - currentQuestion[0]);
+
+        setCurrentQuestion(null);
+    }
+
+    //puts the correct answer in a random spot of the wrong answers array
+    const jumbleAnswers = (correct_answer, incorrect_answers) => {
+
+        const decodedCorrect = he.decode(correct_answer);
+        const decodedIncorrect = incorrect_answers.map(a => he.decode(a));
+        setCorrectAnswer(decodedCorrect)
+
+        const answersArray = [...decodedIncorrect];
+
+        const randomIndex = Math.floor(Math.random() * (answersArray.length + 1));
+
+        answersArray.splice(randomIndex, 0, decodedCorrect);
+
+        setAnswers(answersArray)
     }
 
     useEffect(() =>{
-        const quesionDifficulty = () => {
-            if(currentQuestion[0] < 500) {
+        // const quesionDifficulty = () => {
+        //     if(currentQuestion[0] < 500) {
 
-            }
-        }
+        //     }
+        // }
         const fetchTheQuestion = async () => {
             const url = `https://opentdb.com/api.php?amount=1&category=${currentQuestion[1]}&difficulty=easy`
 
@@ -26,10 +50,9 @@ function CurrentQuestion({ playerScore, setPlayerScore, currentQuestion, setCurr
                 if(!response.ok) throw new Error("Error Retriving Question")
 
                 const data = await response.json();
-                setQuestion(data.results[0].question)
-                setAnswers(data.results[0].incorrect_answers)
-
-// need to put data.results[0].correct_answer into a random spot in the data.results[0].incorrect_answers array 
+                setQuestion(he.decode(data.results[0].question))
+                setQuestionData(data)
+                jumbleAnswers(data.results[0].correct_answer, data.results[0].incorrect_answers)
 
                 console.log(data)
                 
@@ -45,14 +68,27 @@ function CurrentQuestion({ playerScore, setPlayerScore, currentQuestion, setCurr
     
 
   return (
-    <div className='absolute h-full w-full bg-amber-500'>
-        {question}
-        <section>
-            {currentQuestion}
+    <div className='absolute h-full w-full bg-blue-400 flex flex-col justify-center items-center'>
+        <section className='mb-6'>
+            {question}
         </section>
 
-        <section>
-            
+        <section className='grid grid-cols-2 gap-4'>
+            {answers.map((ans,i) => (
+                <Button
+                    sx={{
+                        backgroundColor: '#17339a',
+                        border: '4px solid #2aa1ff',
+                        color: '#fff',
+                        padding: '20px',
+                        fontSize: '1.1rem',
+                        '&:hover': {
+                          backgroundColor: '#2aa1ff',
+                          borderColor: '#17339a'}
+                    }}
+                    key={i}
+                    onClick={() => handleAnswer(ans)}>{ans}</Button>
+            ))}
         </section>
 
     </div>
