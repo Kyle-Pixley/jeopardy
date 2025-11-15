@@ -1,12 +1,37 @@
 import { useState, useEffect } from 'react';
 import GameOne from './Components/GameOne';
+import CurrentQuestion from './Components/CurrentQuestion';
 
 function App() {
 
-  const [ catagories, setCatagories ] = useState([
+  const [ questionApiToken, setQuestionApiToken ] = useState('');
 
-  ])
+  useEffect(() => {
+    const fetchSessionToken = async () => {
+      const url = 'https://opentdb.com/api_token.php?command=request'
+      try {
+
+        const response = await fetch(url)
+
+        if(!response.ok){
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Error with DataBase")
+        }
+
+        const data = await response.json();
+        setQuestionApiToken(data.token)
+
+      } catch (err) {
+        console.log(err)
+      }
+    };
+
+    fetchSessionToken();
+  }, [])
+
+  const [ playerScore, setPlayerScore ] = useState(0);
   const [ gameStart, setGameStart ] = useState(false);
+  const [ currentQuestion, setCurrentQuestion ] = useState(null);
 
   const randomCategoryNumber = () => {
     return Math.floor(Math.random() * (32, 9 + 1)) + 9
@@ -46,7 +71,23 @@ function App() {
             animate-slide-in-right-8'>
               Y</span>
       </section>
-      { gameStart ? <GameOne randomCategoryNumber={randomCategoryNumber} /> : null }
+      { gameStart ? 
+        <GameOne 
+          randomCategoryNumber={randomCategoryNumber} 
+          setPlayerScore={setPlayerScore} 
+          setCurrentQuestion={setCurrentQuestion}
+          currentQuestion={currentQuestion}/> 
+        : null }
+      { currentQuestion ?
+        <CurrentQuestion 
+          playerScore={playerScore}
+          setPlayerScore={setPlayerScore}
+          currentQuestion={currentQuestion}
+          setCurrentQuestion={setCurrentQuestion}
+          questionApiToken={questionApiToken}
+        />
+        : null }
+      {playerScore}
     </div>
   )
 }

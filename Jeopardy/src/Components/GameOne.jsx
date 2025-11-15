@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-function GameOne({ randomCategoryNumber }) {
+function GameOne({ randomCategoryNumber, setPlayerScore, setCurrentQuestion }) {
 
-  const [ allCatagories, setAllCatagories ] = useState([
-
-  ])
   const [ gameOneCatagories, setGameOneCatagories ] = useState([]);
   const [ gameOneMoney, setGameOneMoney ] = useState([200,400,600,800,1000]);
 
@@ -51,6 +48,7 @@ function GameOne({ randomCategoryNumber }) {
   const cellClicked = (num, colIndex) => {
     const catagory = gameOneCatagories[colIndex]
     console.log(num, catagory)
+    setCurrentQuestion([num, catagory]);
   }
 
 
