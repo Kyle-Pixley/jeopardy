@@ -2,12 +2,19 @@ import React, { useEffect, useState } from 'react';
 import he from "he";
 import Button from '@mui/material/Button';
 
+let lastQuestionFetch = 0;
+const QUESTION_COOLDOWN_MS = 5000;
+
 function CurrentQuestion({ playerOneScore, setPlayerOneScore, currentQuestion, setCurrentQuestion }) {
 
     const [ question, setQuestion ] = useState('');
     const [ questionData, setQuestionData ] = useState('');
     const [ answers, setAnswers ] = useState([]);
     const [ correctAnswer, setCorrectAnswer ] = useState('');
+
+    const [ loading, setLoading ] = useState(false);
+    const [ error, setError ] = useState(null);
+
 
     const handleAnswer = ans => {
 
@@ -34,36 +41,68 @@ function CurrentQuestion({ playerOneScore, setPlayerOneScore, currentQuestion, s
         setAnswers(answersArray)
     }
 
-    useEffect(() =>{
-        // const quesionDifficulty = () => {
-        //     if(currentQuestion[0] < 500) {
+    useEffect(() => {
+        let isMounted = true;
 
-        //     }
-        // }
         const fetchTheQuestion = async () => {
-            const url = `https://opentdb.com/api.php?amount=1&category=${currentQuestion[1]}&difficulty=easy`
+          setLoading(true);
+          setError(null);
+        
+          try {
+            // 🔹 Cooldown logic
+            const now = Date.now();
+            const elapsed = now - lastQuestionFetch;
 
-            try {
-
-                const response = await fetch(url)
-
-                if(!response.ok) throw new Error("Error Retriving Question")
-
-                const data = await response.json();
-                setQuestion(he.decode(data.results[0].question))
-                setQuestionData(data)
-                jumbleAnswers(data.results[0].correct_answer, data.results[0].incorrect_answers)
-
-                console.log(data)
-                
-            } catch (err) {
-                console.log(err)
+            if (elapsed < QUESTION_COOLDOWN_MS) {
+              const waitMs = QUESTION_COOLDOWN_MS - elapsed;
+              await new Promise(res => setTimeout(res, waitMs));
             }
-        }
-
+        
+            const url = `https://opentdb.com/api.php?amount=1&category=${currentQuestion[1]}&difficulty=easy`;
+        
+            const response = await fetch(url);
+        
+            if (!response.ok) {
+              if (response.status === 429) {
+                throw new Error("Please wait 5 seconds between questions.");
+              }
+              throw new Error("Error retrieving question.");
+            }
+        
+            const data = await response.json();
+        
+            if (!isMounted) return;
+        
+            if (!data.results || data.results.length === 0) {
+              throw new Error("No questions returned.");
+            }
+        
+            const result = data.results[0];
+        
+            setQuestion(he.decode(result.question));
+            setQuestionData(data);
+            jumbleAnswers(result.correct_answer, result.incorrect_answers);
+        
+            // update cooldown timestamp
+            lastQuestionFetch = Date.now();
+        
+            console.log(data);
+        
+          } catch (err) {
+            if (!isMounted) return;
+            console.error(err);
+            setError(err.message || "Something went wrong fetching the question.");
+          } finally {
+            if (isMounted) setLoading(false);
+          }
+        };
+    
         fetchTheQuestion();
-
-    },[])
+    
+        return () => {
+          isMounted = false;
+        };
+    }, []);
 
     
 
@@ -74,6 +113,9 @@ function CurrentQuestion({ playerOneScore, setPlayerOneScore, currentQuestion, s
         </section>
 
         <section className='grid grid-cols-2 gap-4'>
+
+            { loading && (<div>loading...</div>) }
+
             {answers.map((ans,i) => (
                 <Button
                     sx={{

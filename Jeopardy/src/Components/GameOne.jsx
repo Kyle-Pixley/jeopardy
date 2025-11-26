@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FullscreenTileOverlay from './FullscreenTileOverlay';
 
 function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion, setGameTwo }) {
 
@@ -6,7 +7,9 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion, 
   const [ gameOneMoney, setGameOneMoney ] = useState([200,400,600,800,1000]);
   const [ usedCells, setUsedCells ] = useState({});
   const [ activatedCell, setActivatedCell ] = useState(null);
-  const [ pendingQuestion, setPendingQuestion ] = useState(null);
+  
+  const [ overlay, setOverlay ] = useState(null);
+  const [ isAnimating, setIsAnimating ] = useState(false);
 
   useEffect(() => {
     setGameOneCatagories(prev => {
@@ -55,8 +58,11 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion, 
     }
   }
 
-  const cellClicked = (num, colIndex, rowIndex) => {
+  const cellClicked = (event, num, colIndex, rowIndex) => {
     const key = `${rowIndex}-${colIndex}`;
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    setIsAnimating(true);
 
     setActivatedCell(key);
 
@@ -66,8 +72,12 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion, 
     }));
 
     const catagory = gameOneCatagories[colIndex]
-    setPendingQuestion([num, catagory]);
-    // setCurrentQuestion([num, catagory]);
+    setOverlay({
+      rect,
+      value: num,
+      key,
+      question: [num, catagory]
+    })
   }
 
 
@@ -91,40 +101,49 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion, 
                 {gameOneMoney.map((num, rowIndex) => (
                   <div className='flex w-full h-[16.66%]' key={rowIndex}>
                     {Array.from({ length: 6 }).map((_, colIndex) => {
-
                       const key = `${rowIndex}-${colIndex}`;
                       const isUsed = usedCells[key];
-                      const isActive = activatedCell === key;
-
+                      const isOverlayCell = overlay?.key === key;
+                    
                       return (
                         <div
                           key={key}
-                          onClick={() => !isUsed && cellClicked(num,colIndex,rowIndex)}
-
-                          onAnimationEnd={() => {
-                            if (activatedCell === key) {
-                              setActivatedCell(null)
-
-                              if (pendingQuestion) {
-                                setCurrentQuestion(pendingQuestion);
-                                setPendingQuestion(null);
-                              }
+                          className={`
+                            border-2 w-[16.66%] h-full flex justify-center items-center
+                            ${isUsed ? 'opacity-40 pointer-events-none' : 'cursor-pointer'}
+                            ${isOverlayCell ? 'opacity-0 pointer-events-none' : ''}
+                          `}
+                          onClick={e => {
+                            if (!isUsed && !isAnimating) {
+                              cellClicked(e, num, colIndex, rowIndex);
                             }
                           }}
-
-                          className={`border-2 w-[16.66%] h-full flex justify-center items-center ${isUsed && !isActive ? 'opacity-40 pointer-events-none' : 'cursor-pointer'} ${isActive ? 'animate-grow-up' : '' }`}>
-                          {isUsed  && !isActive ? '' : num}
+                        >
+                          {isUsed ? '' : num}
                         </div>
-
-                      )
+                      );
                     })}
                   </div>
                 ))}
+
 
               </section>
             
           </div>
         </section>
+
+        {overlay && (
+          <FullscreenTileOverlay
+          rect={overlay.rect}
+          value={overlay.value}
+          onDone={() => {
+            setCurrentQuestion(overlay.question);
+            setOverlay(null);
+            setIsAnimating(false);
+          }}
+          />
+        )}
+
     </div>
   )
 }
