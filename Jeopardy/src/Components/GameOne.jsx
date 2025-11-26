@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion }) {
+function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion, setGameTwo }) {
 
   const [ gameOneCatagories, setGameOneCatagories ] = useState([]);
   const [ gameOneMoney, setGameOneMoney ] = useState([200,400,600,800,1000]);
   const [ usedCells, setUsedCells ] = useState({});
+  const [ activatedCell, setActivatedCell ] = useState(null);
+  const [ pendingQuestion, setPendingQuestion ] = useState(null);
 
   useEffect(() => {
     setGameOneCatagories(prev => {
@@ -15,6 +17,14 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion }
       return Array.from(set)
     })
   }, []);
+
+  useEffect(() => {
+    console.log('usedcells', Object.keys(usedCells).length)
+    // ! dont forget to change this to >= 30 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (Object.keys(usedCells).length >= 30) {
+      setGameTwo(true);
+    }
+  }, [usedCells])
 
   const catagoryName = num => {
     switch(num){
@@ -48,15 +58,16 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion }
   const cellClicked = (num, colIndex, rowIndex) => {
     const key = `${rowIndex}-${colIndex}`;
 
+    setActivatedCell(key);
+
     setUsedCells(prev => ({
       ...prev,
       [key]: true
     }));
 
     const catagory = gameOneCatagories[colIndex]
-    setCurrentQuestion([num, catagory]);
-    console.log('col: ', colIndex)
-    console.log('row: ', rowIndex)
+    setPendingQuestion([num, catagory]);
+    // setCurrentQuestion([num, catagory]);
   }
 
 
@@ -83,14 +94,28 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion }
 
                       const key = `${rowIndex}-${colIndex}`;
                       const isUsed = usedCells[key];
+                      const isActive = activatedCell === key;
 
                       return (
                         <div
                           key={key}
-                          className={`border-2 w-[16.66%] h-full flex justify-center items-center ${isUsed ? 'opacity-40 pointer-events-none' : 'cursor-pointer'}`}
-                          onClick={() => !isUsed && cellClicked(num,colIndex,rowIndex)}>
-                          {isUsed ? '' : num}
+                          onClick={() => !isUsed && cellClicked(num,colIndex,rowIndex)}
+
+                          onAnimationEnd={() => {
+                            if (activatedCell === key) {
+                              setActivatedCell(null)
+
+                              if (pendingQuestion) {
+                                setCurrentQuestion(pendingQuestion);
+                                setPendingQuestion(null);
+                              }
+                            }
+                          }}
+
+                          className={`border-2 w-[16.66%] h-full flex justify-center items-center ${isUsed && !isActive ? 'opacity-40 pointer-events-none' : 'cursor-pointer'} ${isActive ? 'animate-grow-up' : '' }`}>
+                          {isUsed  && !isActive ? '' : num}
                         </div>
+
                       )
                     })}
                   </div>

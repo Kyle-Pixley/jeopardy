@@ -33,21 +33,42 @@ function App() {
   const [ gameStart, setGameStart ] = useState(false);
   const [ currentQuestion, setCurrentQuestion ] = useState(null);
   const [ animate, setAnimate ] = useState(false);
+  const [ gameTwo, setGameTwo ] = useState(false);
+  const [ finalGame, setFinalGame ] = useState(false);
 
   const randomCategoryNumber = () => {
     return Math.floor(Math.random() * (32, 9 + 1)) + 9
-   }
+   };
 
+  const gameNumber = () => {
+    if(finalGame) {
+      return (<div>FinalGame</div>)
+    } else if (gameTwo) {
+      return (<div>GameTwo</div>)
+    } else if (gameStart) {
+      return ( 
+        <GameOne 
+          randomCategoryNumber={randomCategoryNumber} 
+          setPlayerOneScore={setPlayerOneScore} 
+          setCurrentQuestion={setCurrentQuestion}
+          currentQuestion={currentQuestion}
+          setGameTwo={setGameTwo}
+        /> 
+      )
+    } else return null
+  }
+
+  //! set to 3500 
   const startGame = () => {
     setAnimate(true);
     setTimeout(() => {
       setGameStart(true);
-    }, 3000)
+    }, 0)
   };
   
 
   return (
-    <div className='flex  justify-center h-full bg-blue-600'>
+    <div className='flex justify-center h-full bg-blue-600'>
       <section>
           <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right ${animate ? 'animate-swoop-out' : ''}`}>
               J</span>
@@ -66,13 +87,9 @@ function App() {
           <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right-8 ${animate ? 'animate-swoop-out-8' : ''}`}>
               Y</span>
       </section>
-      { gameStart ? 
-        <GameOne 
-          randomCategoryNumber={randomCategoryNumber} 
-          setPlayerOneScore={setPlayerOneScore} 
-          setCurrentQuestion={setCurrentQuestion}
-          currentQuestion={currentQuestion}/> 
-        : null }
+
+      { gameNumber() }
+
       { currentQuestion ?
         <CurrentQuestion 
           playerOneScore={playerOneScore}
