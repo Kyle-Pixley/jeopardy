@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Button from '@mui/material/Button';
 import GameOne from './Components/GameOne';
 import CurrentQuestion from './Components/CurrentQuestion';
 
@@ -25,69 +26,83 @@ function App() {
         console.log(err)
       }
     };
-
     fetchSessionToken();
   }, [])
 
-  const [ playerScore, setPlayerScore ] = useState(0);
+  const [ playerOneScore, setPlayerOneScore ] = useState(0);
   const [ gameStart, setGameStart ] = useState(false);
   const [ currentQuestion, setCurrentQuestion ] = useState(null);
+  const [ animate, setAnimate ] = useState(false);
 
   const randomCategoryNumber = () => {
     return Math.floor(Math.random() * (32, 9 + 1)) + 9
    }
 
-  useEffect(() => {
+  const startGame = () => {
+    setAnimate(true);
     setTimeout(() => {
       setGameStart(true);
-    }, 3500)
-  },[])
+    }, 3000)
+  };
+  
 
   return (
     <div className='flex  justify-center h-full bg-blue-600'>
       <section>
-          <span className='inline-block text-white text-[7em] text-shadow-lg/100 
-            animate-slide-in-right'>
+          <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right ${animate ? 'animate-swoop-out' : ''}`}>
               J</span>
-          <span className='inline-block text-white text-[7em] text-shadow-lg/100 
-            animate-slide-in-right-2'>
+          <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right-2 ${animate ? 'animate-swoop-out-2' : ''}`}>
               E</span>
-          <span className='inline-block text-white text-[7em] text-shadow-lg/100 
-            animate-slide-in-right-3'>
+          <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right-3 ${animate ? 'animate-swoop-out-3' : ''}`}>
               O</span>
-          <span className='inline-block text-white text-[7em] text-shadow-lg/100 
-            animate-slide-in-right-4'>
+          <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right-4 ${animate ? 'animate-swoop-out-4' : ''}`}>
               P</span>
-          <span className='inline-block text-white text-[7em] text-shadow-lg/100 
-            animate-slide-in-right-5'>
+          <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right-5 ${animate ? 'animate-swoop-out-5' : ''}`}>
               A</span>
-          <span className='inline-block text-white text-[7em] text-shadow-lg/100 
-            animate-slide-in-right-6'>
+          <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right-6 ${animate ? 'animate-swoop-out-6' : ''}`}>
               R</span>
-          <span className='inline-block text-white text-[7em] text-shadow-lg/100 
-            animate-slide-in-right-7'>
+          <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right-7 ${animate ? 'animate-swoop-out-7' : ''}`}>
               D</span>
-          <span className='inline-block text-white text-[7em] text-shadow-lg/100 
-            animate-slide-in-right-8'>
+          <span className={`inline-block text-white text-[7em] text-shadow-lg/100 animate-slide-in-right-8 ${animate ? 'animate-swoop-out-8' : ''}`}>
               Y</span>
       </section>
       { gameStart ? 
         <GameOne 
           randomCategoryNumber={randomCategoryNumber} 
-          setPlayerScore={setPlayerScore} 
+          setPlayerOneScore={setPlayerOneScore} 
           setCurrentQuestion={setCurrentQuestion}
           currentQuestion={currentQuestion}/> 
         : null }
       { currentQuestion ?
         <CurrentQuestion 
-          playerScore={playerScore}
-          setPlayerScore={setPlayerScore}
+          playerOneScore={playerOneScore}
+          setPlayerOneScore={setPlayerOneScore}
           currentQuestion={currentQuestion}
           setCurrentQuestion={setCurrentQuestion}
           questionApiToken={questionApiToken}
         />
         : null }
-      {playerScore}
+
+      {gameStart ? null : (
+        <section className='absolute bottom-[30%] w-full flex justify-evenly'>
+          <Button variant='contained' color='primary' onClick={() => startGame()}
+            className={`${animate ? 'animate-slide-left-out' : '' }`}
+            sx={{
+              width: "15%",
+            }}>One Player</Button>
+          <Button variant='contained' color='primary' onClick={() => startGame()}
+            className={`${animate ? 'animate-slide-left-out-2' : '' }`}
+            sx={{
+              width: "15%",
+            }}>Two Player</Button>
+          <Button variant='contained' color='primary' onClick={() => startGame()}
+            className={`${animate ? 'animate-slide-left-out-3' : '' }`}
+            sx={{
+              width: "15%",
+            }}>Three Player</Button>
+        </section>
+      )}
+
     </div>
   )
 }

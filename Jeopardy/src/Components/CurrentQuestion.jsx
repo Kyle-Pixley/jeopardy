@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import he from "he";
 import Button from '@mui/material/Button';
 
-function CurrentQuestion({ playerScore, setPlayerScore, currentQuestion, setCurrentQuestion }) {
+function CurrentQuestion({ playerOneScore, setPlayerOneScore, currentQuestion, setCurrentQuestion }) {
 
     const [ question, setQuestion ] = useState('');
     const [ questionData, setQuestionData ] = useState('');
@@ -12,8 +12,8 @@ function CurrentQuestion({ playerScore, setPlayerScore, currentQuestion, setCurr
     const handleAnswer = ans => {
 
         if(ans === correctAnswer) {
-            setPlayerScore(playerScore + currentQuestion[0])
-        } else setPlayerScore(playerScore - currentQuestion[0]);
+            setPlayerOneScore(playerOneScore + currentQuestion[0])
+        } else setPlayerOneScore(playerOneScore - currentQuestion[0]);
 
         setCurrentQuestion(null);
     }

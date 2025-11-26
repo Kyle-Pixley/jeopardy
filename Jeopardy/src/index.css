@@ -22,9 +22,23 @@
   --animate-slide-in-right-8: slide-in-right 3s ease-out 1.4s both;
 
   @keyframes slide-in-right {
+
     0% { transform: translate(100vw, 50vh) scale(0.1); }
-    30% { transform: translate(10vw, 0) scale(1); }
-    60% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(10vw, 0) scale(1); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  --animate-swoop-out: swoop-out 3s ease-out both;
+  --animate-swoop-out-2: swoop-out 3s ease-out .2s both;
+  --animate-swoop-out-3: swoop-out 3s ease-out .4s both;
+  --animate-swoop-out-4: swoop-out 3s ease-out .6s both;
+  --animate-swoop-out-5: swoop-out 3s ease-out .8s both;
+  --animate-swoop-out-6: swoop-out 3s ease-out 1s both;
+  --animate-swoop-out-7: swoop-out 3s ease-out 1.2s both;
+  --animate-swoop-out-8: swoop-out 3s ease-out 1.4s both;
+
+  @keyframes swoop-out {
+/* !!!!!!!!!!!!!!fix this so it is smoother at the start  */
     62% { transform: translate(-1vw, 1vh) scale(1); }
     64% { transform: translate(-3vw, 3vh) scale(1.2); }
     66% { transform: translate(-6vw, 6vh) scale(1.4); }
@@ -36,6 +50,16 @@
     78% { transform: translate(6vw, 25vh) scale(2.6); }
     80% { transform: translate(10vw, 34vh) scale(2.8); }
     100% { transform: translate(100vw, 50vh) scale(10); }
+  }
+
+  --animate-slide-left-out: slide-left-out 2s ease-out both;
+  --animate-slide-left-out-2: slide-left-out 2s ease-out .2s both;
+  --animate-slide-left-out-3: slide-left-out 2s ease-out .4s both;
+
+  @keyframes slide-left-out {
+    0% { transform: translateX(0)}
+    5% { transform: translateX(10px)}
+    100% { transform: translateX(-100vw)}
   }
 
   --animate-slide-down: slide-down 1s ease-out both;

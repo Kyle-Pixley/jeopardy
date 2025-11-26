@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-function GameOne({ randomCategoryNumber, setPlayerScore, setCurrentQuestion }) {
+function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion }) {
 
   const [ gameOneCatagories, setGameOneCatagories ] = useState([]);
   const [ gameOneMoney, setGameOneMoney ] = useState([200,400,600,800,1000]);
