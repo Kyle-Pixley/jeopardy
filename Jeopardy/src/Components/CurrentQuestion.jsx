@@ -44,12 +44,12 @@ function CurrentQuestion({ playerOneScore, setPlayerOneScore, currentQuestion, s
     useEffect(() => {
         let isMounted = true;
 
-        const fetchTheQuestion = async () => {
+        const fetchTheQuestion = async ( retry = 0) => {
           setLoading(true);
           setError(null);
         
           try {
-            // 🔹 Cooldown logic
+
             const now = Date.now();
             const elapsed = now - lastQuestionFetch;
 
@@ -62,11 +62,11 @@ function CurrentQuestion({ playerOneScore, setPlayerOneScore, currentQuestion, s
         
             const response = await fetch(url);
         
-            if (!response.ok) {
-              if (response.status === 429) {
-                throw new Error("Please wait 5 seconds between questions.");
-              }
-              throw new Error("Error retrieving question.");
+            if(response.status === 429 ) {
+              console.warn('Error 429, retrying...');
+              lastQuestionFetch = Date.now();
+              await new Promise(res => setTimeout(res, QUESTION_COOLDOWN_MS));
+              return fetchTheQuestion(retry + 1);
             }
         
             const data = await response.json();
@@ -83,7 +83,6 @@ function CurrentQuestion({ playerOneScore, setPlayerOneScore, currentQuestion, s
             setQuestionData(data);
             jumbleAnswers(result.correct_answer, result.incorrect_answers);
         
-            // update cooldown timestamp
             lastQuestionFetch = Date.now();
         
             console.log(data);
@@ -114,7 +113,13 @@ function CurrentQuestion({ playerOneScore, setPlayerOneScore, currentQuestion, s
 
         <section className='grid grid-cols-2 gap-4'>
 
-            { loading && (<div>loading...</div>) }
+            { loading && (
+              <div className='flex items-center gap-1 text-3xl'>
+                <span>Loading</span>
+                <span className='animate-loading-dot'>.</span>
+                <span className='animate-loading-dot-2'>.</span>
+                <span className='animate-loading-dot-3'>.</span>
+              </div>) }
 
             {answers.map((ans,i) => (
                 <Button

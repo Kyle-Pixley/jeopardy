@@ -77,6 +77,16 @@
     80% { transform: scale(6) }
     100% { transform: scale(8) }
   }
+
+  --animate-loading-dot: loading-dot 1s ease-out both;
+  --animate-loading-dot-2: loading-dot 2s ease-out both;
+  --animate-loading-dot-3: loading-dot 3s ease-out both;
+
+  @keyframes loading-dot {
+    0% { transform: scale(0) }
+    50% { transform: scale(.3) }
+    100% { transform: scale(1) }
+  }
   
 }
 
