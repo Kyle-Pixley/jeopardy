@@ -5,6 +5,7 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion, 
 
   const [ gameOneCatagories, setGameOneCatagories ] = useState([]);
   const [ gameOneMoney, setGameOneMoney ] = useState([200,400,600,800,1000]);
+  const [ gameTwoMoney, setGameTwoMoney ] = useState([400,800,1200,1600,2000]);
   const [ usedCells, setUsedCells ] = useState({});
   const [ activatedCell, setActivatedCell ] = useState(null);
   
@@ -24,7 +25,7 @@ function GameOne({ randomCategoryNumber, setPlayerOneScore, setCurrentQuestion, 
   useEffect(() => {
     console.log('usedcells', Object.keys(usedCells).length)
     // ! dont forget to change this to >= 30 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if (Object.keys(usedCells).length >= 30) {
+    if (Object.keys(usedCells).length >= 2) {
       setGameTwo(true);
     }
   }, [usedCells])
